@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KAPAN DAN HARI APA KITA LAHIR</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          boxShadow: {
+            glass: '0 10px 35px rgba(0,0,0,.35)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- AOS (Animate on Scroll) -->
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet"/>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    /* Glass + gradient background */
+    :root{
+      --bg1:#0b1020;
+      --bg2:#1a1140;
+      --bg3:#0b3a6a;
+    }
+    body{
+      background:
+        radial-gradient(1200px 800px at 20% 15%, rgba(168,85,247,.35), transparent 60%),
+        radial-gradient(900px 700px at 80% 30%, rgba(59,130,246,.28), transparent 60%),
+        radial-gradient(900px 700px at 55% 85%, rgba(34,211,238,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2) 55%, var(--bg3));
+      min-height: 100vh;
+    }
+    .glass{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--tw-shadow, 0 10px 35px rgba(0,0,0,.35));
+    }
+    .soft-ring{
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.10) inset,
+        0 20px 40px rgba(0,0,0,.35);
+    }
+    .glow{
+      position: relative;
+      overflow: hidden;
+    }
+    .glow:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(120deg,
+        rgba(168,85,247,.35),
+        rgba(59,130,246,.30),
+        rgba(34,211,238,.18)
+      );
+      filter: blur(24px);
+      opacity:.65;
+      z-index:0;
+    }
+    .glow > *{ position:relative; z-index:1; }
+
+    /* Pretty date input on dark background */
+    input[type="date"]{
+      color-scheme: dark;
+    }
+
+    /* Smooth reveal */
+    .hidden-soft{ display:none; }
+  </style>
+</head>
+
+<body class="font-sans text-white">
+  <main class="max-w-5xl mx-auto px-4 py-10 md:py-14">
+    <!-- Header -->
+    <section class="glow rounded-3xl p-6 md:p-8 glass soft-ring" data-aos="fade-up">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs md:text-sm px-3 py-1 rounded-full glass">
+            <i class="fa-solid fa-sparkles"></i>
+            <span class="opacity-90">Ide Oleh Aziz • Code dari ChatGPT • Dan • Gemini</span>
+          </div>
+          <h1 class="mt-4 text-2xl md:text-4xl font-extrabold tracking-tight">
+            KAPAN DAN HARI APA KITA LAHIR
+          </h1>
+          <p class="mt-2 text-white/75 max-w-2xl">
+            Masukkan tanggal lahirmu, lalu lihat detail: hari Masehi, weton Jawa, Hijriyah (estimasi), zodiak, motivasi, dan saran jodoh—dengan nuansa elegan glassmorphism.
+          </p>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="btnDemo" class="px-4 py-2 rounded-xl glass hover:bg-white/10 transition active:scale-[.98]">
+            <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Contoh
+          </button>
+          <button id="btnResetTop" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition active:scale-[.98]">
+            <i class="fa-solid fa-rotate-left mr-2"></i>Cek Lagi
+          </button>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-12 gap-3">
+        <div class="md:col-span-8">
+          <label class="text-sm text-white/80 block mb-2">
+            <i class="fa-regular fa-calendar-days mr-2"></i>Tanggal lahir
+          </label>
+          <input id="birthDate" type="date"
+            class="w-full rounded-2xl px-4 py-3 bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-400/40 focus:border-white/20 transition"
+          />
+          <p id="hint" class="mt-2 text-xs text-white/55">
+            Tips: gunakan tanggal lahir asli agar weton dan hari-nya tepat.
+          </p>
+        </div>
+
+        <div class="md:col-span-4 flex items-end gap-2">
+          <button id="btnCheck"
+            class="w-full rounded-2xl px-4 py-3 font-semibold bg-gradient-to-r from-purple-500/80 to-blue-500/80 hover:from-purple-500 hover:to-blue-500 transition active:scale-[.98]">
+            <i class="fa-solid fa-magnifying-glass mr-2"></i>Cek Sekarang
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section id="results" class="mt-8 hidden-soft">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- Left: primary cards -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Summary -->
+          <div class="glass rounded-3xl p-6 soft-ring" data-aos="fade-up">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2 class="text-xl md:text-2xl font-bold">
+                  <i class="fa-solid fa-circle-info mr-2 text-cyan-200/90"></i>Ringkasan
+                </h2>
+                <p class="mt-1 text-white/70">Hasil dihitung dari tanggal yang kamu pilih.</p>
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-white/60">Tanggal dipilih</div>
+                <div id="pickedDateLabel" class="font-semibold"></div>
+              </div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs text-white/60"><i class="fa-regular fa-clock mr-2"></i>Hari Masehi</div>
+                <div id="gregDay" class="mt-1 text-lg font-bold"></div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs text-white/60"><i class="fa-solid fa-leaf mr-2"></i>Weton (Jawa)</div>
+                <div id="weton" class="mt-1 text-lg font-bold"></div>
+                <div id="wetonDetail" class="mt-1 text-xs text-white/60"></div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs text-white/60"><i class="fa-solid fa-moon mr-2"></i>Hijriyah (estimasi)</div>
+                <div id="hijri" class="mt-1 text-lg font-bold"></div>
+                <div class="mt-1 text-xs text-white/55">Menggunakan algoritma estimasi tabular/civil (untuk info umum).</div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs text-white/60"><i class="fa-solid fa-star mr-2"></i>Zodiak</div>
+                <div id="zodiac" class="mt-1 text-lg font-bold"></div>
+                <div id="zodiacMeta" class="mt-1 text-xs text-white/60"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Future forecast -->
+          <div class="glass rounded-3xl p-6 soft-ring" data-aos="fade-up" data-aos-delay="50">
+            <h3 class="text-lg md:text-xl font-bold">
+              <i class="fa-solid fa-compass mr-2 text-purple-200/90"></i>Ramalan Masa Depan (Positif & Realistis)
+            </h3>
+            <p id="forecast" class="mt-3 text-white/80 leading-relaxed"></p>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs text-white/60"><i class="fa-solid fa-briefcase mr-2"></i>Fokus Karier</div>
+                <div id="careerTip" class="mt-1 text-sm text-white/80"></div>
+              </div>
+              <div class="glass rounded-2xl p-4">
+                <div class="text-xs text-white/60"><i class="fa-solid fa-heart mr-2"></i>Fokus Relasi</div>
+                <div id="relationTip" class="mt-1 text-sm text-white/80"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Match -->
+          <div class="glass rounded-3xl p-6 soft-ring" data-aos="fade-up" data-aos-delay="100">
+            <h3 class="text-lg md:text-xl font-bold">
+              <i class="fa-solid fa-user-group mr-2 text-pink-200/90"></i>Kemungkinan Jodoh
+            </h3>
+            <p id="match" class="mt-3 text-white/80 leading-relaxed"></p>
+            <div class="mt-4 glass rounded-2xl p-4">
+              <div class="text-xs text-white/60"><i class="fa-solid fa-lightbulb mr-2"></i>Checklist hubungan sehat</div>
+              <ul class="mt-2 text-sm text-white/80 list-disc pl-5 space-y-1">
+                <li>Komunikasi jelas (nggak cuma asumsi).</li>
+                <li>Nilai hidup sejalan, tapi tetap saling beri ruang.</li>
+                <li>Konsisten: kata dan tindakan nyambung.</li>
+                <li>Support target masing-masing, bukan saling “mengerdilkan”.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: motivation & extras -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="glass rounded-3xl p-6 soft-ring" data-aos="fade-up">
+            <h3 class="text-lg md:text-xl font-bold">
+              <i class="fa-solid fa-quote-left mr-2 text-amber-200/90"></i>Kata-kata Motivasi
+            </h3>
+            <blockquote id="quote" class="mt-3 text-white/85 leading-relaxed"></blockquote>
+            <div id="quoteBy" class="mt-2 text-xs text-white/60"></div>
+
+            <div class="mt-4 flex gap-2">
+              <button id="btnNewQuote"
+                class="w-full rounded-2xl px-4 py-2 glass hover:bg-white/10 transition active:scale-[.98]">
+                <i class="fa-solid fa-arrows-rotate mr-2"></i>Ganti Kutipan
+              </button>
+              <button id="btnCopyAll"
+                class="w-full rounded-2xl px-4 py-2 bg-white/10 hover:bg-white/15 transition active:scale-[.98]">
+                <i class="fa-regular fa-copy mr-2"></i>Copy Ringkas
+              </button>
+            </div>
+          </div>
+
+          <div class="glass rounded-3xl p-6 soft-ring" data-aos="fade-up" data-aos-delay="80">
+            <h3 class="text-lg md:text-xl font-bold">
+              <i class="fa-solid fa-gear mr-2 text-emerald-200/90"></i>Catatan Perhitungan
+            </h3>
+            <ul class="mt-3 text-sm text-white/75 space-y-2">
+              <li><span class="font-semibold text-white/85">Hari Masehi</span> dari sistem Date JavaScript.</li>
+              <li><span class="font-semibold text-white/85">Weton</span>: kombinasi <em>pasaran</em> 5-harian + <em>dina</em> 7-harian.</li>
+              <li><span class="font-semibold text-white/85">Hijriyah</span>: konversi estimasi tabular/civil.</li>
+              <li><span class="font-semibold text-white/85">Zodiak</span>: rentang tanggal standar.</li>
+            </ul>
+          </div>
+
+          <div class="glass rounded-3xl p-6 soft-ring" data-aos="fade-up" data-aos-delay="120">
+            <h3 class="text-lg md:text-xl font-bold">
+              <i class="fa-solid fa-circle-check mr-2 text-cyan-200/90"></i>Aksi
+            </h3>
+            <p class="mt-2 text-sm text-white/75">
+              Mau cek tanggal lain? Reset dulu biar tampilannya bersih.
+            </p>
+            <button id="btnReset"
+              class="mt-4 w-full rounded-2xl px-4 py-3 font-semibold bg-gradient-to-r from-cyan-500/70 to-sky-500/70 hover:from-cyan-500 hover:to-sky-500 transition active:scale-[.98]">
+              <i class="fa-solid fa-rotate-left mr-2"></i>Cek Lagi
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <footer class="mt-8 text-center text-xs text-white/45" data-aos="fade-up">
+        Dibuat dengan Tailwind + AOS + Vanilla JS • “Hijriyah” adalah estimasi, cocok untuk penggunaan informatif.
+      </footer>
+    </section>
+  </main>
+
+  <!-- AOS JS -->
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+  <script>
+    // ---------------------------
+    // Helpers
+    // ---------------------------
+    const $ = (sel) => document.querySelector(sel);
+
+    const daysID = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+    const pasaran = ["Legi","Pahing","Pon","Wage","Kliwon"];
+
+    function pad2(n){ return String(n).padStart(2,"0"); }
+
+    function formatDateID(d){
+      // d is Date
+      const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function clampIndex(i, m){
+      return ((i % m) + m) % m;
+    }
+
+    // ---------------------------
+    // WETON (accurate method using known reference)
+    // Reference used:
+    // 1 Jan 1970 = Thursday (Kamis) and Pasaran = Legi
+    // We compute day difference from 1970-01-01 local date (no timezone drift via UTC midnights).
+    // Pasaran cycle = 5 days.
+    // ---------------------------
+    function diffDaysUTC(dateA, dateB){
+      // compute whole-day difference using UTC to avoid DST/timezone issues
+      const a = Date.UTC(dateA.getFullYear(), dateA.getMonth(), dateA.getDate());
+      const b = Date.UTC(dateB.getFullYear(), dateB.getMonth(), dateB.getDate());
+      return Math.floor((a - b) / 86400000);
+    }
+
+    function getWeton(date){
+      const ref = new Date(1970,0,1); // Jan 1, 1970
+      const d = diffDaysUTC(date, ref); // date - ref in days
+      const pasaranIndex = clampIndex(d, 5); // because ref pasaran = Legi index 0
+      const dinaIndex = date.getDay(); // 0..6 (Sun..Sat)
+      return {
+        dina: daysID[dinaIndex],
+        pasaran: pasaran[pasaranIndex],
+        dinaIndex,
+        pasaranIndex
+      };
+    }
+
+    // ---------------------------
+    // Hijri (Tabular Islamic Calendar - Civil)
+    // Estimation algorithm based on Julian Day.
+    // ---------------------------
+    function gregorianToJD(y, m, d){
+      // y=year, m=month (1-12), d=day
+      // Fliegel-Van Flandern algorithm for Gregorian to JD
+      const a = Math.floor((14 - m) / 12);
+      const y2 = y + 4800 - a;
+      const m2 = m + 12*a - 3;
+      return d + Math.floor((153*m2 + 2)/5) + 365*y2 + Math.floor(y2/4) - Math.floor(y2/100) + Math.floor(y2/400) - 32045;
+    }
+
+    function islamicToJD(iy, im, id){
+      // Tabular Islamic (civil) calendar
+      // 1 Muharram 1 AH = 1948439.5 (Julian day)
+      return id
+        + Math.ceil(29.5*(im-1))
+        + (iy-1)*354
+        + Math.floor((3 + 11*iy)/30)
+        + 1948439 - 1;
+    }
+
+    function jdToIslamic(jd){
+      // Convert JD (integer at midnight) to Islamic date (civil)
+      const jd0 = jd; // integer JD
+      const iy = Math.floor((30*(jd0 - 1948439) + 10646) / 10631);
+      const im = Math.min(12, Math.ceil((jd0 - (29 + islamicToJD(iy,1,1))) / 29.5) + 1);
+      const id = jd0 - islamicToJD(iy, im, 1) + 1;
+
+      return { iy, im, id };
+    }
+
+    function hijriName(im){
+      const names = [
+        "Muharram","Safar","Rabiul Awal","Rabiul Akhir",
+        "Jumadil Awal","Jumadil Akhir","Rajab","Syaban",
+        "Ramadhan","Syawal","Dzulqaidah","Dzulhijjah"
+      ];
+      return names[im-1] || "";
+    }
+
+    function getHijri(date){
+      const y = date.getFullYear();
+      const m = date.getMonth()+1;
+      const d = date.getDate();
+      const jd = gregorianToJD(y,m,d);
+      const h = jdToIslamic(jd);
+      return h;
+    }
+
+    // ---------------------------
+    // Zodiac
+    // ---------------------------
+    function getZodiac(date){
+      const m = date.getMonth()+1;
+      const d = date.getDate();
+
+      const z = [
+        {name:"Capricorn", element:"Tanah", start:[12,22], end:[1,19]},
+        {name:"Aquarius", element:"Udara", start:[1,20], end:[2,18]},
+        {name:"Pisces", element:"Air", start:[2,19], end:[3,20]},
+        {name:"Aries", element:"Api", start:[3,21], end:[4,19]},
+        {name:"Taurus", element:"Tanah", start:[4,20], end:[5,20]},
+        {name:"Gemini", element:"Udara", start:[5,21], end:[6,20]},
+        {name:"Cancer", element:"Air", start:[6,21], end:[7,22]},
+        {name:"Leo", element:"Api", start:[7,23], end:[8,22]},
+        {name:"Virgo", element:"Tanah", start:[8,23], end:[9,22]},
+        {name:"Libra", element:"Udara", start:[9,23], end:[10,22]},
+        {name:"Scorpio", element:"Air", start:[10,23], end:[11,21]},
+        {name:"Sagittarius", element:"Api", start:[11,22], end:[12,21]},
+      ];
+
+      function isBetween(mm, dd, start, end){
+        // Handles Capricorn wrap around year
+        const [sm, sd] = start;
+        const [em, ed] = end;
+
+        if (sm < em || (sm === em && sd <= ed)){
+          // normal range
+          return (mm > sm || (mm === sm && dd >= sd)) && (mm < em || (mm === em && dd <= ed));
+        } else {
+          // wraps year-end
+          return (mm > sm || (mm === sm && dd >= sd)) || (mm < em || (mm === em && dd <= ed));
+        }
+      }
+
+      const found = z.find(item => isBetween(m, d, item.start, item.end)) || z[0];
+      return found;
+    }
+
+    // ---------------------------
+    // Narratives (positive but realistic)
+    // Based on element + weton pasaran
+    // ---------------------------
+    const wetonVibes = {
+      Legi:   { core:"hangat & menenangkan", strength:"mudah bikin orang nyaman", watch:"jangan terlalu memendam demi menjaga harmoni" },
+      Pahing: { core:"tegas & berani",        strength:"punya dorongan kuat untuk maju", watch:"hindari keputusan saat emosi tinggi" },
+      Pon:    { core:"visioner & strategis",  strength:"cepat melihat pola dan peluang", watch:"jangan overthinking sampai tunda aksi" },
+      Wage:   { core:"realistis & setia",     strength:"konsisten dan bisa diandalkan", watch:"jangan keras pada diri sendiri" },
+      Kliwon: { core:"intuitif & peka",       strength:"tajam membaca situasi/energi sekitar", watch:"butuh batasan agar tidak cepat lelah" },
+    };
+
+    const elementVibes = {
+      Api:   { style:"enerjik, berani, suka tantangan", career:"ambil proyek yang butuh kepemimpinan; pecah target jadi sprint kecil", relation:"latih sabar saat beda pendapat; validasi perasaan pasangan dulu baru solusi" },
+      Tanah: { style:"stabil, tekun, suka hasil nyata", career:"fokus bangun sistem; rapikan rutinitas dan finansial kecil-kecil tapi rutin", relation:"tunjukkan sayang lewat tindakan; jangan gengsi bilang butuh dukungan" },
+      Udara: { style:"komunikatif, kreatif, cepat adaptasi", career:"perkuat portofolio/jejaring; catat ide lalu pilih 1 prioritas untuk dieksekusi", relation:"hindari tarik-ulur; jelaskan ekspektasi dengan lembut tapi tegas" },
+      Air:   { style:"empatik, intuitif, perasa", career:"pilih kerja yang punya makna; jaga energi dengan batas jam dan istirahat", relation:"butuh rasa aman; bangun trust pelan-pelan dan jujur soal kebutuhan" },
+    };
+
+    const matchSuggestionsByElement = {
+      Api:   ["Udara (Gemini/Libra/Aquarius)", "Api yang dewasa (Aries/Leo/Sagittarius)"],
+      Tanah: ["Air (Cancer/Scorpio/Pisces)", "Tanah yang suportif (Taurus/Virgo/Capricorn)"],
+      Udara: ["Api (Aries/Leo/Sagittarius)", "Udara yang komunikatif (Gemini/Libra/Aquarius)"],
+      Air:   ["Tanah (Taurus/Virgo/Capricorn)", "Air yang stabil emosinya (Cancer/Scorpio/Pisces)"],
+    };
+
+    const quotes = [
+      { q:"Pelan itu bukan mundur—itu cara kamu menjaga konsistensi.", by:"— KAPAN & HARI APA" },
+      { q:"Disiplin kecil setiap hari mengalahkan motivasi besar yang jarang muncul.", by:"— Catatan Hidup" },
+      { q:"Kamu tidak harus cepat; kamu hanya harus tetap bergerak.", by:"— Pengingat" },
+      { q:"Berani itu bukan tanpa takut, tapi tetap melangkah walau ragu.", by:"— Nafas Baru" },
+      { q:"Hasil besar sering lahir dari keputusan sederhana yang diulang.", by:"— Prinsip Praktis" },
+      { q:"Jaga energi. Dunia butuh versi terbaikmu, bukan versi terkurasmu.", by:"— Self-care yang waras" },
+      { q:"Hari ini cukup: satu langkah jelas, satu hal selesai.", by:"— Fokus" },
+      { q:"Kamu boleh istirahat, tapi jangan menyerah pada dirimu sendiri.", by:"— Kamu Bisa" },
+    ];
+
+    function seededIndex(seedStr, mod){
+      // simple deterministic seed from string
+      let h = 2166136261;
+      for (let i=0; i<seedStr.length; i++){
+        h ^= seedStr.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return Math.abs(h) % mod;
+    }
+
+    function pickQuote(dateStr){
+      const idx = seededIndex(dateStr + "|" + new Date().toISOString().slice(0,10), quotes.length);
+      return quotes[idx];
+    }
+
+    function buildForecast(z, wet){
+      const w = wetonVibes[wet.pasaran] || wetonVibes.Legi;
+      const e = elementVibes[z.element] || elementVibes.Tanah;
+
+      return {
+        forecast:
+`Kombinasi energi <span class="font-semibold">${z.name}</span> (elemen <span class="font-semibold">${z.element}</span>) dan weton <span class="font-semibold">${wet.dina} ${wet.pasaran}</span> cenderung membuatmu terlihat <span class="font-semibold">${e.style}</span> dengan aura yang <span class="font-semibold">${w.core}</span>. Dalam 3–6 bulan ke depan, peluang terbaikmu biasanya muncul saat kamu berani “merapikan satu hal penting”: entah rutinitas, skill inti, atau relasi yang perlu kejelasan. Kamu punya kekuatan <span class="font-semibold">${w.strength}</span>, jadi fokuslah pada langkah kecil yang konsisten. Catatan realistisnya: <span class="font-semibold">${w.watch}</span>—itu sering jadi titik rawan yang kalau dijaga, hasilnya bisa jauh lebih stabil.`,
+        career: e.career,
+        relation: e.relation
+      };
+    }
+
+    function buildMatch(z, wet){
+      const w = wetonVibes[wet.pasaran] || wetonVibes.Legi;
+      const candidates = matchSuggestionsByElement[z.element] || ["Orang yang komunikatif dan dewasa secara emosional"];
+      const hint = {
+        Legi: "Kamu cocok dengan sosok yang hangat dan tidak suka drama.",
+        Pahing:"Kamu cocok dengan sosok yang tenang tapi tegas, bisa jadi penyeimbang.",
+        Pon:  "Kamu cocok dengan sosok yang menghargai visi dan mau tumbuh bareng.",
+        Wage: "Kamu cocok dengan sosok yang konsisten dan menghargai komitmen.",
+        Kliwon:"Kamu cocok dengan sosok yang peka dan menghormati batasan."
+      }[wet.pasaran] || "Kamu cocok dengan sosok yang dewasa dan konsisten.";
+
+      return `Dari sisi elemen, kecocokan biasanya kuat dengan <span class="font-semibold">${candidates[0]}</span> atau <span class="font-semibold">${candidates[1]}</span>. Dari sisi weton, karena auramu cenderung <span class="font-semibold">${w.core}</span>, relasi yang ideal adalah yang memberi rasa aman, komunikasi jujur, dan ritme yang konsisten. ${hint} Fokuskan pada orang yang siap kerja sama (bukan cuma cocok di awal).`;
+    }
+
+    // ---------------------------
+    // UI Actions
+    // ---------------------------
+    function showResults(){
+      $("#results").classList.remove("hidden-soft");
+      AOS.refreshHard();
+      window.scrollTo({ top: $("#results").offsetTop - 10, behavior: "smooth" });
+    }
+
+    function hideResults(){
+      $("#results").classList.add("hidden-soft");
+    }
+
+    function resetAll(){
+      $("#birthDate").value = "";
+      hideResults();
+      $("#hint").textContent = "Tips: gunakan tanggal lahir asli agar weton dan hari-nya tepat.";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function setDemo(){
+      // Example date: 1999-09-09
+      $("#birthDate").value = "1999-09-09";
+      $("#hint").textContent = "Contoh terisi. Klik “Cek Sekarang”.";
+    }
+
+    function render(date){
+      // Basic validation
+      if (!(date instanceof Date) || isNaN(date)) return;
+
+      // Labels
+      $("#pickedDateLabel").textContent = formatDateID(date);
+
+      // Gregorian day
+      const dayName = daysID[date.getDay()];
+      $("#gregDay").textContent = dayName;
+
+      // Weton
+      const w = getWeton(date);
+      $("#weton").textContent = `${w.dina} ${w.pasaran}`;
+      $("#wetonDetail").textContent = `Dina: ${w.dina} • Pasaran: ${w.pasaran}`;
+
+      // Hijri
+      const h = getHijri(date);
+      $("#hijri").textContent = `${h.id} ${hijriName(h.im)} ${h.iy} H`;
+
+      // Zodiac
+      const z = getZodiac(date);
+      $("#zodiac").textContent = z.name;
+      $("#zodiacMeta").textContent = `Elemen: ${z.element}`;
+
+      // Narratives
+      const narr = buildForecast(z, w);
+      $("#forecast").innerHTML = narr.forecast;
+      $("#careerTip").textContent = narr.career;
+      $("#relationTip").textContent = narr.relation;
+
+      $("#match").innerHTML = buildMatch(z, w);
+
+      // Quote (dynamic, deterministic-ish per date + today)
+      const dateStr = `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
+      const q = pickQuote(dateStr);
+      $("#quote").textContent = `“${q.q}”`;
+      $("#quoteBy").textContent = q.by;
+
+      showResults();
+    }
+
+    function newQuote(){
+      const val = $("#birthDate").value;
+      if (!val) return;
+      const d = new Date(val + "T00:00:00");
+      const dateStr = `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+
+      // Slightly change seed using time chunk
+      const t = String(Math.floor(Date.now() / (1000 * 60))); // per minute
+      const idx = seededIndex(dateStr + "|" + t, quotes.length);
+      const q = quotes[idx];
+      $("#quote").textContent = `“${q.q}”`;
+      $("#quoteBy").textContent = q.by;
+    }
+
+    async function copySummary(){
+      const val = $("#birthDate").value;
+      if (!val) return;
+
+      const d = new Date(val + "T00:00:00");
+      const w = getWeton(d);
+      const z = getZodiac(d);
+      const h = getHijri(d);
+
+      const text =
+`KAPAN DAN HARI APA KITA LAHIR
+Tanggal: ${formatDateID(d)}
+Hari Masehi: ${daysID[d.getDay()]}
+Weton: ${w.dina} ${w.pasaran}
+Hijriyah (estimasi): ${h.id} ${hijriName(h.im)} ${h.iy} H
+Zodiak: ${z.name} (Elemen: ${z.element})
+Motivasi: ${$("#quote").textContent.replaceAll("“","").replaceAll("”","")}`;
+
+      try{
+        await navigator.clipboard.writeText(text);
+        $("#btnCopyAll").innerHTML = `<i class="fa-solid fa-check mr-2"></i>Tersalin`;
+        setTimeout(()=> $("#btnCopyAll").innerHTML = `<i class="fa-regular fa-copy mr-2"></i>Copy Ringkas`, 1200);
+      } catch(e){
+        alert("Gagal menyalin. Browser kamu mungkin tidak mengizinkan clipboard di konteks ini.");
+      }
+    }
+
+    // ---------------------------
+    // Init
+    // ---------------------------
+    AOS.init({
+      duration: 650,
+      easing: "ease-out-cubic",
+      once: true
+    });
+
+    $("#btnCheck").addEventListener("click", () => {
+      const val = $("#birthDate").value;
+      if (!val){
+        $("#hint").textContent = "Isi tanggal lahir dulu ya 🙂";
+        $("#hint").className = "mt-2 text-xs text-amber-200/90";
+        return;
+      }
+      $("#hint").className = "mt-2 text-xs text-white/55";
+      const date = new Date(val + "T00:00:00");
+      render(date);
+    });
+
+    $("#btnReset").addEventListener("click", resetAll);
+    $("#btnResetTop").addEventListener("click", resetAll);
+    $("#btnDemo").addEventListener("click", setDemo);
+
+    $("#btnNewQuote").addEventListener("click", newQuote);
+    $("#btnCopyAll").addEventListener("click", copySummary);
+
+    // Allow pressing Enter on date input
+    $("#birthDate").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") $("#btnCheck").click();
+    });
+
+    // Auto-hide results when date changes (optional UX)
+    $("#birthDate").addEventListener("change", () => {
+      if (!$("#results").classList.contains("hidden-soft")) {
+        // keep it visible but update hint
+        $("#hint").textContent = "Tanggal berubah—klik “Cek Sekarang” untuk update hasil.";
+      }
+    });
+  </script>
+</body>
+                                              </html>
